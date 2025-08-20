@@ -1,0 +1,40 @@
+.how-section {
+  background-color: #fefefe;
+  padding: 70px 20px;
+  text-align: center;
+}
+
+.how-title {
+  font-weight: bold;
+  color: #b30000;
+  margin-bottom: 40px;
+}
+
+.how-card {
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 16px;
+  padding: 30px 20px;
+  box-shadow: 0 6px 24px rgba(179, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.how-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(179, 0, 0, 0.3);
+}
+
+.how-emoji {
+  font-size: 50px;
+}
+
+.how-step {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #b30000;
+}
+
+.how-desc {
+  margin-top: 8px;
+  color: #333;
+  font-size: 16px;
+}

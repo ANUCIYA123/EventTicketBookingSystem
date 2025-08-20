@@ -1,0 +1,32 @@
+.testimonial-section {
+  padding: 80px 20px;
+  background: #fefefe;
+  text-align: center;
+}
+
+.testimonial-heading {
+  font-weight: bold;
+  margin-bottom: 40px;
+  color: #b30000;
+}
+
+.testimonial-card {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 30px 25px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(179, 0, 0, 0.1);
+}
+
+.testimonial-message {
+  font-size: 18px;
+  color: #444;
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
+.testimonial-name {
+  font-weight: bold;
+  color: #b30000;
+}
