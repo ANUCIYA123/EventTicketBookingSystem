@@ -2,28 +2,25 @@
 import { useEffect, useState } from 'react';
 import {
   Box, Typography, Paper, TextField,
-  MenuItem, Button, Stack
+  Button, Stack
 } from '@mui/material';
 import axios from 'axios';
-import { CSVLink } from 'react-csv';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
-  const [donors, setDonors] = useState([]);
-  const [requests, setRequests] = useState([]);
+  const [users, setUsers] = useState([]);
   const [search, setSearch] = useState('');
-  const [bloodGroup, setBloodGroup] = useState('');
-  const [city, setCity] = useState('');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [number, setNumber] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const donorRes = await axios.get('http://localhost:8080/doner/getAllDonor');
-        const requestRes = await axios.get('http://localhost:8080/receiver/getAllReceiver');
-        setDonors(donorRes.data || []);
-        setRequests(requestRes.data || []);
+        const userRes = await axios.get('http://localhost:8080/getAllUser');
+        setUsers(userRes.data || []);
       } catch (err) {
         console.error('Failed to load admin data:', err);
       }
@@ -31,196 +28,154 @@ const AdminDashboard = () => {
     fetchData();
   }, []);
 
+  // 🔎 Filtering logic
   const filterData = (data) => {
     return data.filter((item) => {
       const q = search.toLowerCase();
       const matchesSearch =
-        item.fullName?.toLowerCase().includes(q) ||
+        item.username?.toLowerCase().includes(q) ||
         item.email?.toLowerCase().includes(q);
 
-      const matchesBlood = bloodGroup ? item.bloodGroup === bloodGroup : true;
-      const matchesCity = city ? item.city?.toLowerCase().includes(city.toLowerCase()) : true;
+      const matchesUsername = username ? item.username?.toLowerCase().includes(username.toLowerCase()) : true;
+      const matchesEmail = email ? item.email?.toLowerCase().includes(email.toLowerCase()) : true;
+      const matchesNumber = number ? item.number?.toString().includes(number) : true;
 
-
-      return matchesSearch && matchesBlood && matchesCity;
+      return matchesSearch && matchesUsername && matchesEmail && matchesNumber;
     });
   };
 
-  const exportPDF = (type, data) => {
+  // 📄 Export PDF
+  const exportPDF = (data) => {
     const doc = new jsPDF();
-    const title = type === 'donor' ? 'Donors' : 'Blood Requests';
-    const headers =
-      type === 'donor'
-        ? ['Name', 'Email', 'Phone', 'Blood Group', 'City', 'Last Donation']
-        : ['Name', 'Email', 'Phone', 'Blood Group', 'City', 'Required Date', 'Reason'];
+    const title = 'User Details';
+    const headers = ['Username', 'Email', 'Number', 'Card No', 'Expire Date', 'CVV'];
 
-    const rows = data.map((item) =>
-      type === 'donor'
-        ? [
-          item.fullName,
-          item.email,
-          item.phone,
-          item.bloodGroup,
-          item.city,
-          item.lastDonationDate,
-        ]
-        : [
-          item.fullName,
-          item.email,
-          item.phone,
-          item.bloodGroup,
-          item.city,
-          item.requiredDate,
-          item.reason,
-        ]
-    );
+    const rows = data.map((item) => [
+      item.username,
+      item.email,
+      item.number,
+      item.cardno,
+      item.expriedate,
+      item.cvv,
+    ]);
 
     doc.text(title, 14, 10);
     doc.autoTable({ head: [headers], body: rows });
     doc.save(`${title}.pdf`);
   };
 
-  const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
-
-  const CardsGrid = ({ data, type }) => (
+  // 📦 Cards layout
+  const CardsGrid = ({ data }) => (
     <Box
       sx={{
         mt: 2,
         display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)', // ← always 3 columns
+        gridTemplateColumns: 'repeat(3, 1fr)',
         gap: 6,
         alignItems: 'stretch',
       }}
     >
       {data.map((item, idx) => (
         <Paper
-          key={`${type}-${item.id ?? idx}`}
+          key={item.id ?? idx}
           elevation={3}
           className="glass-card"
           sx={{ p: 2, width: '100%', height: '100%' }}
         >
-          <Typography variant="h6" color="error">
-            {idx + 1}. {item.fullName}
+          <Typography variant="h6" color="purple" fontWeight="bold" mb={1}>
+            {idx + 1}. {item.username}
           </Typography>
-          <Typography>Email: {item.email}</Typography>
-          <Typography>Phone: {item.phone}</Typography>
-          <Typography>Blood Group: {item.bloodGroup}</Typography>
-          <Typography>City: {item.city}</Typography>
-          {type === 'donor' && (
-            <Typography>Last Donation: {item.lastDonationDate}</Typography>
-          )}
-          {type === 'request' && (
-            <>
-              <Typography>Required Date: {item.requiredDate}</Typography>
-              <Typography>Reason: {item.reason}</Typography>
-            </>
-          )}
+          <Typography >Email: {item.email}</Typography>
+          <Typography>Number: {item.number}</Typography>
+          <Typography>Card No: {item.cardno}</Typography>
+          <Typography>Expire Date: {item.expriedate}</Typography>
+          <Typography>CVV: {item.cvv}</Typography>
         </Paper>
       ))}
     </Box>
   );
 
-  const filteredDonors = filterData(donors);
-  const filteredRequests = filterData(requests);
+  const filteredUsers = filterData(users);
 
   return (
-    <Box p={4} className="admin-dashboard-bg" sx={{ backgroundImage: 'url(admn.jpg)', backgroundSize: 'cover' }}>
-      <Typography variant="h4" gutterBottom textAlign="center">
-        Admin Dashboard
+    <Box p={4} className="admin-dashboard-bg" sx={{ backgroundImage: 'url(.jpg)', backgroundSize: 'cover' }}>
+      <Typography variant="h4" gutterBottom textAlign="center" color='purple' fontWeight="bold"> 
+        Dashboard
       </Typography>
 
       {/* Filters */}
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} mt={2} mb={3}>
         <TextField
-          label="Search by Name or Email"
+          label="Search by Username or Email"
           variant="outlined"
           fullWidth
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          InputLabelProps={{ style: { color: 'red' } }}
-           sx={{
+         InputLabelProps={{ style: { color: 'purple' } }}
+          sx={{
             "& .MuiOutlinedInput-root": {
-              "& fieldset": { borderColor: "red" },
+              "& fieldset": { borderColor: "purple" },
               "&:hover fieldset": { borderColor: "darkred" },
-              "&.Mui-focused fieldset": { borderColor: "red" }
+              "&.Mui-focused fieldset": { borderColor: "purple" }
             }
           }}
         />
         <TextField
-          label="Blood Group"
-          select
-          fullWidth
-          value={bloodGroup}
-          onChange={(e) => setBloodGroup(e.target.value)}
-          InputLabelProps={{ style: { color: 'red' } }}
-           sx={{
-            "& .MuiOutlinedInput-root": {
-              "& fieldset": { borderColor: "red" },
-              "&:hover fieldset": { borderColor: "darkred" },
-              "&.Mui-focused fieldset": { borderColor: "red" }
-            }
-          }}
-        >
-          <MenuItem value="">All</MenuItem>
-          {bloodGroups.map((bg) => (
-            <MenuItem key={bg} value={bg}>{bg}</MenuItem>
-          ))}
-        </TextField>
-        <TextField
-          label="City"
+          label="Filter Username"
           variant="outlined"
           fullWidth
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          InputLabelProps={{ style: { color: 'red' } }}
-           sx={{
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+           InputLabelProps={{ style: { color: 'purple' } }}
+          sx={{
             "& .MuiOutlinedInput-root": {
-              "& fieldset": { borderColor: "red" },
+              "& fieldset": { borderColor: "purple" },
               "&:hover fieldset": { borderColor: "darkred" },
-              "&.Mui-focused fieldset": { borderColor: "red" }
+              "&.Mui-focused fieldset": { borderColor: "purple" }
+            }
+          }}
+        />
+        <TextField
+          label="Filter Email"
+          variant="outlined"
+          fullWidth
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          InputLabelProps={{ style: { color: 'purple' } }}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": { borderColor: "purple" },
+              "&:hover fieldset": { borderColor: "darkred" },
+              "&.Mui-focused fieldset": { borderColor: "purple" }
+            }
+          }}
+        />
+        <TextField
+          label="Filter Number"
+          variant="outlined"
+          fullWidth
+          value={number}
+          onChange={(e) => setNumber(e.target.value)}
+         InputLabelProps={{ style: { color: 'purple' } }}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": { borderColor: "purple" },
+              "&:hover fieldset": { borderColor: "darkred" },
+              "&.Mui-focused fieldset": { borderColor: "purple" }
             }
           }}
         />
       </Stack>
 
-      {/* Donors */}
+      {/* User Section */}
       <Box mb={2}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography variant="h5">Donors</Typography>
+          <Typography variant="h5" color='purple'>Users</Typography>
           <Stack direction="row" spacing={1}>
-            <CSVLink data={filteredDonors} filename="Donors.csv">
-              <Button variant="outlined" color="error">Export CSV</Button>
-            </CSVLink>
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={() => exportPDF('donor', filteredDonors)}
-            >
-              Export PDF
-            </Button>
+           
           </Stack>
         </Stack>
-        <CardsGrid data={filteredDonors} type="donor" />
-      </Box>
-
-      {/* Requests */}
-      <Box mt={4}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography variant="h5">Blood Requests</Typography>
-          <Stack direction="row" spacing={1}>
-            <CSVLink data={filteredRequests} filename="Requests.csv">
-              <Button variant="outlined" color="error">Export CSV</Button>
-            </CSVLink>
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={() => exportPDF('request', filteredRequests)}
-            >
-              Export PDF
-            </Button>
-          </Stack>
-        </Stack>
-        <CardsGrid data={filteredRequests} type="request" />
+        <CardsGrid data={filteredUsers} />
       </Box>
     </Box>
   );

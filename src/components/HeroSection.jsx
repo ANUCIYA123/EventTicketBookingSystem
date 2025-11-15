@@ -1,318 +1,395 @@
 import React, { useState } from "react";
+import axios from "axios";
 import {
   Box,
   Button,
   Container,
-  Grid,
   Typography,
   Paper,
+  Modal,
   TextField,
-  MenuItem,
-  Alert,
-  Snackbar,
+  Divider,
+  CircularProgress,
 } from "@mui/material";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-import axios from "axios"; // ✅ import axios
+import adminimg from "../assets/admin.jpg";
+import rock from "../assets/rock.jpg";
+import jazz from "../assets/jazz.jpg";
+import tech from "../assets/tech.jpg";
+import art from "../assets/art.jpeg";
 
 const HeroSection = () => {
-  const [showDonorForm, setShowDonorForm] = useState(false);
-  const [formData, setFormData] = useState({
-    id: 0,
-    fullName: "",
-    email: "",
-    phone: "",
-    bloodGroup: "",
-    city: "",
-    lastDonationDate: ""
-  });
-  const [error, setError] = useState("");
-  const [snack, setSnack] = useState({
-    open: false,
-    severity: "success",
-    message: "",
-  });
+  const events = [
+    {
+      id: 1,
+      title: "Rock Music Festival",
+      description: "Top rock bands live!",
+      image: rock
 
-  const navigate = useNavigate();
+    },
+    {
+      id: 2,
+      title: "Jazz Night",
+      description: "Smooth jazz performances.",
+      image: jazz
+    },
+    {
+      id: 3,
+      title: "Tech Conference",
+      description: "Latest in tech and innovation.",
+      image: tech
+    },
+    {
+      id: 4,
+      title: "Art Expo",
+      description: "Exhibition of modern art.",
+      image: art
+    },
+ 
+
+  ];
+
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    number: "",
+    cardno: "",
+    expriedate: "",
+    cvv: "",
+  });
+  const [showTicket, setShowTicket] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const openForm = (event) => {
+    setSelectedEvent(event);
+    setFormData({
+      username: "",
+      email: "",
+      number: "",
+      cardno: "",
+      expriedate: "",
+      cvv: "",
+    });
+    setShowTicket(false);
+    setErrorMsg("");
+  };
+
+  const closeForm = () => {
+    setSelectedEvent(null);
+    setShowTicket(false);
+    setErrorMsg("");
+    setLoading(false);
+  };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError("");
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg("");
 
-    const today = new Date();
-    const lastDate = new Date(formData.lastDonationDate);
-    const diffMonths =
-      (today.getFullYear() - lastDate.getFullYear()) * 12 +
-      (today.getMonth() - lastDate.getMonth());
+    const { username, email, number, cardno, expriedate, cvv } = formData;
 
-    if (diffMonths < 3) {
-      setError("⚠️ You can donate only after 3 months from your last donation.");
+    if (!username || !email || !number || !cardno || !expriedate || !cvv) {
+      setErrorMsg("Please fill all fields.");
       return;
     }
 
+    setLoading(true);
+
     try {
-      // ✅ POST to backend
-      const response = await axios.post("http://localhost:8080/doner/saveDonor", formData);
-
-      console.log("✅ Donor Data Saved:", response.data);
-      setSnack({
-        open: true,
-        severity: "success",
-        message: "🎉 Donor registered successfully!",
+      const res = await axios.post("http://localhost:8080/saveUser", {
+        eventId: selectedEvent?.id,
+        ...formData,
       });
 
-
-      setShowDonorForm(false);
-      setFormData({
-        id: 0,
-        fullName: "",
-        email: "",
-        phone: "",
-        bloodGroup: "",
-        city: "",
-        lastDonationDate: ""
-      });
+      if ([200, 201].includes(res.status)) {
+        setShowTicket(true);
+      } else {
+        setErrorMsg("Booking failed. Try again.");
+      }
     } catch (err) {
-      console.error("❌ Error saving donor:", err);
-      setSnack({
-        open: true,
-        severity: "error",
-        message: "Something went wrong! Please try again.",
-      });
+      console.error("Booking error:", err);
+      setErrorMsg("Server error. Please try again later.");
     }
-  };
 
-  const handleCloseSnack = () => {
-    setSnack({ ...snack, open: false });
+    setLoading(false);
   };
 
   return (
     <Box
-      className="hero-section"
       sx={{
         minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        backgroundImage: "url('bg1.jpg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
         py: 8,
+        background: "url('bg3.jpg') center/cover",
       }}
     >
-      <Container>
-        <Grid container spacing={6} alignItems="center">
-          {/* Left Section */}
-          <Grid item xs={12} md={6}>
+      <Container maxWidth="md">
+        <Typography
+          variant="h3"
+          fontWeight="bold"
+          color="white"
+          textAlign="center"
+          mb={6}
+        >
+          Book Your Favorite Events
+        </Typography>
+
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+            gap: 4,
+          }}
+        >
+          {events.map((event) => (
             <motion.div
-              initial={{ x: -100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.8 }}
-            >
-              <Typography
-                variant="h2"
-                fontWeight="bold"
-                gutterBottom
-                sx={{ color: "#b71c1c" }}
-              >
-                Donate Blood, Save Lives
-              </Typography>
-              <Typography
-                variant="h6"
-                color="text.secondary"
-                paragraph
-                sx={{ mb: 4,textShadow: "5px 5px 5px rgba(0, 0, 0, 0.3)" }}
-              >
-                Your small act of kindness can give someone a second chance at
-                life. Join our community of donors and make a difference today.
-              </Typography>
-
-              <Box className="button-group" sx={{ display: "flex", gap: 2 }}>
-                <Button
-                  variant="contained"
-                  color="error"
-                  size="large"
-                  onClick={() => setShowDonorForm(!showDonorForm)}
-                  className="pulse-button"
-                  sx={{ px: 4, borderRadius: "10px" }}
-                >
-                  Become a Donor
-                </Button>
-
-                <Button
-                  variant="outlined"
-                  color="error"
-                  size="large"
-                  onClick={() => navigate("/request-blood")}
-                  className="pulse-button"
-                  sx={{ px: 4, borderRadius: "10px" }}
-                >
-                  Request Blood
-                </Button>
-              </Box>
-
-              {/* Donor Form */}
-              {showDonorForm && (
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                >
-                  <Paper
-                    elevation={6}
-                    sx={{
-                      mt: 4,
-                      p: 3,
-                      borderRadius: 3,
-                      backgroundColor: "#fff",
-                    }}
-                  >
-                    <Typography variant="h5" mb={2} color="error">
-                      Donor Registration Form
-                    </Typography>
-
-                    {error && (
-                      <Alert severity="error" sx={{ mb: 2 }}>
-                        {error}
-                      </Alert>
-                    )}
-
-                    <form onSubmit={handleSubmit}>
-                      <TextField
-                        label="Full Name"
-                        name="fullName"
-                        fullWidth
-                        margin="normal"
-                        value={formData.fullName}
-                        onChange={handleChange}
-                        required
-                      />
-                      <TextField
-                        label="Email"
-                        name="email"
-                        type="email"
-                        fullWidth
-                        margin="normal"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                      />
-                      <TextField
-                        label="Phone"
-                        name="phone"
-                        type="tel"
-                        fullWidth
-                        margin="normal"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        required
-                      />
-                      <TextField
-                        select
-                        label="Blood Group"
-                        name="bloodGroup"
-                        fullWidth
-                        margin="normal"
-                        value={formData.bloodGroup}
-                        onChange={handleChange}
-                        required
-                      >
-                        {["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"].map(
-                          (group) => (
-                            <MenuItem key={group} value={group}>
-                              {group}
-                            </MenuItem>
-                          )
-                        )}
-                      </TextField>
-                      <TextField
-                        label="City"
-                        name="city"
-                        fullWidth
-                        margin="normal"
-                        value={formData.city}
-                        onChange={handleChange}
-                        required
-                      />
-                      <TextField
-                        label="Last Donation Date"
-                        name="lastDonationDate"
-                        type="date"
-                        fullWidth
-                        margin="normal"
-                        value={formData.lastDonationDate}
-                        onChange={handleChange}
-                        InputLabelProps={{ shrink: true }}
-                        required
-                      />
-
-                      <Button
-                        type="submit"
-                        variant="contained"
-                        color="error"
-                        fullWidth
-                        sx={{ mt: 2 }}
-                      >
-                        Submit
-                      </Button>
-                    </form>
-                  </Paper>
-                </motion.div>
-              )}
-            </motion.div>
-          </Grid>
-
-          {/* Right Section */}
-          <Grid item xs={12} md={6}>
-            <motion.div
-              initial={{ x: 100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.8 }}
+              key={event.id}
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6 }}
             >
               <Paper
                 elevation={6}
                 sx={{
-                  borderRadius: 4,
+                  height: 400,
+                  borderRadius: 3,
                   overflow: "hidden",
-                  boxShadow: "0 8px 30px rgba(183, 28, 28, 0.3)",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "flex-end",
+                  position: "relative",
                 }}
               >
+                <img
+                  src={event.image} // this will work for each imported image
+                  alt={event.title}
+                  style={{
+                    position: "absolute",
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    top: 0,
+                    left: 0,
+                    zIndex: 1,
+                  }}
+                />
+                <Box
+                  sx={{
+                    background: "rgba(0,0,0,0.65)",
+                    p: 3,
+                    position: "relative",
+                    zIndex: 2,
+                  }}
+                >
+                  <Typography variant="h5" color="white" fontWeight="bold">
+                    {event.title}
+                  </Typography>
+                  <Typography variant="body2" color="white" sx={{ mb: 2 }}>
+                    {event.description}
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => openForm(event)}
+                  >
+                    Book Now
+                  </Button>
+                </Box>
               </Paper>
+
             </motion.div>
-          </Grid>
-        </Grid>
+          ))}
+        </Box>
       </Container>
 
-      {/* ✅ Snackbar for feedback */}
-      <Snackbar
-        open={snack.open}
-        autoHideDuration={4000}
-        onClose={handleCloseSnack}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      <Modal
+        open={!!selectedEvent}
+        onClose={closeForm}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          p: 2,
+        }}
       >
-        <Alert
-          onClose={handleCloseSnack}
-          severity={snack.severity}
-          variant="filled"
+        <Paper
           sx={{
-            width: "100%",
-            fontWeight: "bold",
-            backgroundColor:
-              snack.severity === "error"
-                ? "#d32f2f !important"
-                : "#2e7d32 !important",
-            color: "#fff !important",
+            p: 4,
+            width: { xs: "90%", sm: 400 },
+            borderRadius: 3,
+            maxHeight: "90vh",
+            overflowY: "auto",
           }}
+          elevation={12}
         >
-          {snack.message}
-        </Alert>
+          {showTicket ? (
+            <>
+              <Typography
+                variant="h5"
+                fontWeight="bold"
+                textAlign="center"
+                gutterBottom
+                sx={{
+                  color: "white",
+                  textShadow: "2px 2px 4px rgba(0, 0, 0, 1)",
+                }}
+              >
+                🎟 Your Ticket is Confirmed!
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              <Typography
+                sx={{
+                  color: "white",
+                  textShadow: "2px 2px 4px rgba(0, 0, 0, 1)",
+                }}
+              >
+                <strong>Username:</strong> {formData.username}
+              </Typography>
+              <Typography
+                sx={{
+                  color: "white",
+                  textShadow: "2px 2px 4px rgba(0, 0, 0, 1)",
+                }}
+              >
+                <strong>Email:</strong> {formData.email}
+              </Typography>
+              <Typography
+                sx={{
+                  color: "white",
+                  textShadow: "2px 2px 4px rgba(0, 0, 0, 1)",
+                }}
+              >
+                <strong>Phone:</strong> {formData.number}
+              </Typography>
+              <Typography
+                sx={{
+                  color: "white",
+                  textShadow: "2px 2px 4px rgba(0, 0, 0, 1)",
+                }}
+              >
+                <strong>Event:</strong> {selectedEvent?.title}
+              </Typography>
+              <Typography
+                sx={{
+                  mt: 1,
+                  color: "white",
+                  textShadow: "2px 2px 4px rgba(0, 0, 0, 1)",
+                }}
+              >
+                <strong>Card:</strong> **** **** **** {formData.cardno.slice(-4)}
+              </Typography>
 
-      </Snackbar>
+              <Button
+                fullWidth
+                variant="contained"
+                color="secondary"
+                sx={{ mt: 3 }}
+                onClick={closeForm}
+              >
+                Close
+              </Button>
+            </>
+          ) : (
+            <>
+              <Typography
+                variant="h6"
+                fontWeight="bold"
+                gutterBottom
+                sx={{
+                  color: "white",
+                  textShadow: "2px 2px 4px rgba(0, 0, 0, 1)",
+                }}
+              >
+                Book for: {selectedEvent?.title}
+              </Typography>
 
+              {errorMsg && (
+                <Typography color="error" sx={{ mb: 2 }}>
+                  {errorMsg}
+                </Typography>
+              )}
+
+              <form onSubmit={handleSubmit}>
+                <TextField
+                  fullWidth
+                  label="Username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  sx={{ mb: 2 }}
+                  required
+                />
+                <TextField
+                  fullWidth
+                  label="Email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  sx={{ mb: 2 }}
+                  required
+                />
+                <TextField
+                  fullWidth
+                  label="Phone Number"
+                  name="number"
+                  value={formData.number}
+                  onChange={handleChange}
+                  sx={{ mb: 2 }}
+                  required
+                />
+                <TextField
+                  fullWidth
+                  label="Card Number"
+                  name="cardno"
+                  value={formData.cardno}
+                  onChange={handleChange}
+                  sx={{ mb: 2 }}
+                  required
+                />
+                <TextField
+                  fullWidth
+                  label="Expiry Date (MM/YY)"
+                  name="expriedate"
+                  value={formData.expriedate}
+                  onChange={handleChange}
+                  sx={{ mb: 2 }}
+                  required
+                />
+                <TextField
+                  fullWidth
+                  label="CVV"
+                  name="cvv"
+                  value={formData.cvv}
+                  onChange={handleChange}
+                  sx={{ mb: 3 }}
+                  required
+                />
+
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="secondary"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <CircularProgress size={24} color="inherit" />
+                  ) : (
+                    "Confirm Booking"
+                  )}
+                </Button>
+              </form>
+            </>
+          )}
+        </Paper>
+      </Modal>
     </Box>
   );
 };

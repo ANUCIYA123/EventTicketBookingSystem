@@ -21,7 +21,7 @@ export default function LoginPage() {
   const handleClose = () => setSnack({ ...snack, open: false });
 
   useEffect(() => {
-    fetch("http://localhost:8080/authentication/get")
+    fetch("http://localhost:8080/getAllLogin")
       .then((res) => res.json())
       .then((data) => setUsers(data))
       .catch((err) => console.error(err));
@@ -54,12 +54,12 @@ export default function LoginPage() {
         </Typography>
 
         <TextField
-          InputLabelProps={{ style: { color: 'red' } }}
+          InputLabelProps={{ style: { color: 'purple' } }}
           sx={{
             "& .MuiOutlinedInput-root": {
-              "& fieldset": { borderColor: "red" },
+              "& fieldset": { borderColor: "purple" },
               "&:hover fieldset": { borderColor: "darkred" },
-              "&.Mui-focused fieldset": { borderColor: "red" }
+              "&.Mui-focused fieldset": { borderColor: "purple" }
             }
           }}
           label="Username"
@@ -70,12 +70,12 @@ export default function LoginPage() {
         />
 
         <TextField
-          InputLabelProps={{ style: { color: 'red' } }}
+          InputLabelProps={{ style: { color: 'purple' } }}
           sx={{
             "& .MuiOutlinedInput-root": {
-              "& fieldset": { borderColor: "red" },
+              "& fieldset": { borderColor: "purple" },
               "&:hover fieldset": { borderColor: "darkred" },
-              "&.Mui-focused fieldset": { borderColor: "red" }
+              "&.Mui-focused fieldset": { borderColor: "purple" }
             }
           }}
           label="Password"
@@ -95,13 +95,18 @@ export default function LoginPage() {
 
         <Button
           variant="contained"
-          color="error"
           fullWidth
           onClick={handleLogin}
-          sx={{ mt: 2, fontWeight: "bold" }}
+          sx={{
+            mt: 2,
+            fontWeight: "bold",
+            bgcolor: "#9c27b0", // purple
+            "&:hover": { bgcolor: "#7b1fa2" } // darker purple on hover
+          }}
         >
           Login
         </Button>
+
 
       </motion.div>
 
@@ -117,7 +122,7 @@ export default function LoginPage() {
           variant="filled"
           sx={{
             width: "100%",
-            backgroundColor: snack.severity === "error" ? "red !important" : "green !important"
+            backgroundColor: snack.severity === "error" ? "red !important" : "purple !important"
           }}
         >
           {snack.message}

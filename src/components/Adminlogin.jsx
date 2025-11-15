@@ -10,7 +10,6 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
-
 export default function AdminLoginPage() {
     const navigate = useNavigate();
     const [data, setData] = useState({ username: "", password: "" });
@@ -60,17 +59,17 @@ export default function AdminLoginPage() {
                 transition={{ duration: 0.7 }}
                 className="login-box"
             >
-                <Typography variant="h4" className="login-title">
+                <Typography variant="h4" className="login-title" sx={{ color: "#6a1b9a" }}>
                     Admin Login
                 </Typography>
 
                 <TextField
-                    InputLabelProps={{ style: { color: "red" } }}
+                    InputLabelProps={{ style: { color: "#6a1b9a" } }}
                     sx={{
                         "& .MuiOutlinedInput-root": {
-                            "& fieldset": { borderColor: "red" },
-                            "&:hover fieldset": { borderColor: "darkred" },
-                            "&.Mui-focused fieldset": { borderColor: "red" },
+                            "& fieldset": { borderColor: "#9c27b0" },
+                            "&:hover fieldset": { borderColor: "#6a1b9a" },
+                            "&.Mui-focused fieldset": { borderColor: "#6a1b9a" },
                         },
                     }}
                     label="Username"
@@ -81,12 +80,12 @@ export default function AdminLoginPage() {
                 />
 
                 <TextField
-                    InputLabelProps={{ style: { color: "red" } }}
+                    InputLabelProps={{ style: { color: "#6a1b9a" } }}
                     sx={{
                         "& .MuiOutlinedInput-root": {
-                            "& fieldset": { borderColor: "red" },
-                            "&:hover fieldset": { borderColor: "darkred" },
-                            "&.Mui-focused fieldset": { borderColor: "red" },
+                            "& fieldset": { borderColor: "#9c27b0" },
+                            "&:hover fieldset": { borderColor: "#6a1b9a" },
+                            "&.Mui-focused fieldset": { borderColor: "#6a1b9a" },
                         },
                     }}
                     label="Password"
@@ -99,15 +98,18 @@ export default function AdminLoginPage() {
 
                 <Button
                     variant="contained"
-                    color="error"
                     fullWidth
                     onClick={handleLogin}
-                    sx={{ mt: 2, fontWeight: "bold" }}
+                    sx={{
+                        mt: 2,
+                        fontWeight: "bold",
+                        bgcolor: "#9c27b0",
+                        "&:hover": { bgcolor: "#6a1b9a" },
+                    }}
                 >
                     Login
                 </Button>
             </motion.div>
-
 
             <Snackbar
                 open={snack.open}
@@ -121,13 +123,15 @@ export default function AdminLoginPage() {
                     variant="filled"
                     sx={{
                         width: "100%",
-                        bgcolor: snack.severity === "error" ? "#f44336 !important" : "#4caf50 !important",
+                        bgcolor:
+                            snack.severity === "error"
+                                ? "#ba68c8 !important"
+                                : "#6a1b9a !important",
                         color: "#fff",
                     }}
                 >
                     {snack.message}
                 </Alert>
-
             </Snackbar>
         </Container>
     );

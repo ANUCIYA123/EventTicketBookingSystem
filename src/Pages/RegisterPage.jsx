@@ -63,7 +63,7 @@ export default function RegisterPage() {
     }
 
     try {
-      const res = await fetch("http://localhost:8080/authentication/post", {
+      const res = await fetch("http://localhost:8080/saveLogin", {
         method: "POST",
         body: JSON.stringify({
           username: formData.username,
@@ -118,15 +118,14 @@ export default function RegisterPage() {
               backgroundColor: "#fff !important",
               padding: 4,
               borderRadius: 3,
-              borderLeft: "5px solid red",
+              borderLeft: "5px solid purple",
               boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.1)"
             }}
           >
 
             <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
-              <BloodtypeIcon color="error" sx={{ fontSize: 40, mr: 1 }} />
-              <Typography variant="h4" fontWeight="bold" color="error.main">
-                Donor Registration
+              <Typography variant="h4" fontWeight="bold" color="purple" >
+                User Registration
               </Typography>
             </Box>
 
@@ -137,12 +136,12 @@ export default function RegisterPage() {
                   fullWidth
                   value={formData.username}
                   onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  InputLabelProps={{ style: { color: 'red' } }}
+                  InputLabelProps={{ style: { color: 'purple' } }}
                   sx={{
                     "& .MuiOutlinedInput-root": {
-                      "& fieldset": { borderColor: "red" },
+                      "& fieldset": { borderColor: "purple" },
                       "&:hover fieldset": { borderColor: "darkred" },
-                      "&.Mui-focused fieldset": { borderColor: "red" }
+                      "&.Mui-focused fieldset": { borderColor: "purple" }
                     }
                   }}
                 />
@@ -155,12 +154,12 @@ export default function RegisterPage() {
                   fullWidth
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  InputLabelProps={{ style: { color: 'red' } }}
+                  InputLabelProps={{ style: { color: 'purple' } }}
                   sx={{
                     "& .MuiOutlinedInput-root": {
-                      "& fieldset": { borderColor: "red" },
+                      "& fieldset": { borderColor: "purple" },
                       "&:hover fieldset": { borderColor: "darkred" },
-                      "&.Mui-focused fieldset": { borderColor: "red" }
+                      "&.Mui-focused fieldset": { borderColor: "purple" }
                     }
                   }}
                 />
@@ -174,12 +173,12 @@ export default function RegisterPage() {
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   disabled={isPhoneVerified}
-                  InputLabelProps={{ style: { color: 'red' } }}
+                  InputLabelProps={{ style: { color: 'purple' } }}
                   sx={{
                     "& .MuiOutlinedInput-root": {
-                      "& fieldset": { borderColor: "red" },
+                      "& fieldset": { borderColor: "purple" },
                       "&:hover fieldset": { borderColor: "darkred" },
-                      "&.Mui-focused fieldset": { borderColor: "red" }
+                      "&.Mui-focused fieldset": { borderColor: "purple" }
                     }
                   }}
                 />
@@ -204,12 +203,12 @@ export default function RegisterPage() {
                       fullWidth
                       value={formData.otp}
                       onChange={(e) => setFormData({ ...formData, otp: e.target.value })}
-                      InputLabelProps={{ style: { color: 'red' } }}
+                      InputLabelProps={{ style: { color: 'purple' } }}
                       sx={{
                         "& .MuiOutlinedInput-root": {
-                          "& fieldset": { borderColor: "red" },
+                          "& fieldset": { borderColor: "purple" },
                           "&:hover fieldset": { borderColor: "darkred" },
-                          "&.Mui-focused fieldset": { borderColor: "red" }
+                          "&.Mui-focused fieldset": { borderColor: "purple" }
                         }
                       }}
                     />
@@ -239,12 +238,12 @@ export default function RegisterPage() {
                   fullWidth
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  InputLabelProps={{ style: { color: 'red' } }}
+                  InputLabelProps={{ style: { color: 'purple' } }}
                   sx={{
                     "& .MuiOutlinedInput-root": {
-                      "& fieldset": { borderColor: "red" },
+                      "& fieldset": { borderColor: "purple" },
                       "&:hover fieldset": { borderColor: "darkred" },
-                      "&.Mui-focused fieldset": { borderColor: "red" }
+                      "&.Mui-focused fieldset": { borderColor: "purple" }
                     }
                   }}
                 />
@@ -254,12 +253,18 @@ export default function RegisterPage() {
                 <Button
                   onClick={saveUser}
                   variant="contained"
-                  color="error"
                   fullWidth
-                  sx={{ fontWeight: "bold", height: "45px", borderRadius: "5px" }}
+                  sx={{
+                    fontWeight: "bold",
+                    height: "45px",
+                    borderRadius: "5px",
+                    bgcolor: "#9c27b0", // purple
+                    "&:hover": { bgcolor: "#7b1fa2" } // darker purple on hover
+                  }}
                 >
                   REGISTER
                 </Button>
+
               </Grid>
             </Grid>
           </Paper>

@@ -5,11 +5,11 @@
 }
 
 .nav-link {
-  color: red !important;
+  color: rgb(200, 0, 255) !important;
   font-weight: 500;
   transition: 0.3s ease;
 }
 
 .nav-link:hover {
-  color: #b30000 !important;
+  color: purple !important;
 }
